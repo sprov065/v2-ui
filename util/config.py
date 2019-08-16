@@ -60,7 +60,7 @@ def get_key_file():
 
 
 def get_login_title():
-    return __get('login_title', '登录')
+    return __get('login_title', 'Login')
 
 
 def get_v2_config_path():
@@ -121,38 +121,38 @@ def reset_config():
 
 def init_db(update=False):
     add_if_not_exist(Setting(
-        'address', '面板网页监听地址', '0.0.0.0', 'text',
-        '谨慎修改！！！如果你会使用 nginx 等软件，可以将此设置为 127.0.0.1，这样外界就无法直接访问面板。如果不懂就不要乱修改', True), update)
+        'address', 'Panel Web Listening Address', '0.0.0.0', 'text',
+        'Be careful modifying it!!! If you use software such as nginx, you can set this to 127.0.0.1 so that the outside world cannot access the panel directly. Don't change it if you don't understand', True), update)
     add_if_not_exist(Setting(
-        'port', '面板网页端口', '65432', 'int',
+        'port', 'Panel web port', '65432', 'int',
         '', True), update)
     add_if_not_exist(Setting(
-        'base_path', '面板网页根路径', '', 'text',
-        '谨慎修改！！！可以填写你的个性网页根路径，例如 /v2-ui，默认为空。若填写则必须以 / 开头，不能以 / 结尾，填错会导致无法访问面板', True), update)
+        'base_path', 'Panel page root path', '', 'text',
+        'Be careful modifying it!!! You can fill in the root path of your personality page, such as /v2-ui, which is empty by default. If the fill-in must start with / and cannot end with /, the error will result in inaccessible panels', True), update)
     add_if_not_exist(Setting(
-        'cert_file', '面板ssl证书路径', '', 'text',
-        '谨慎修改！！！需填写一个绝对路径，修改错误会导致无法启动面板', True), update)
+        'cert_file', 'Panel ssl cert file path', '', 'text',
+        'Be careful modifying it!!! An absolute path is required, and a modification error will prevent the panel from starting', True), update)
     add_if_not_exist(Setting(
-        'key_file', '面板ssl密钥路径', '', 'text',
-        '谨慎修改！！！需填写一个绝对路径，修改错误会导致无法启动面板', True), update)
+        'key_file', 'Panel ssl key file path', '', 'text',
+        'Be careful modifying it!!! An absolute path is required, and a modification error will prevent the panel from starting', True), update)
     add_if_not_exist(Setting(
-        'login_title', '登录页标题', '登录', 'text',
+        'login_title', 'Login page title', 'sign in', 'text',
         '', False), update)
     add_if_not_exist(Setting(
-        'v2_config_path', 'v2ray配置文件路径', '/etc/v2ray/config.json', 'text',
-        '谨慎修改！！！生成的v2ray配置会写入此项配置的文件中，一般无需修改', False), update)
+        'v2_config_path', 'v2ray config.json path', '/etc/v2ray/config.json', 'text',
+        'Be careful modifying it!!! The resulting v2ray configuration is written to the file of this configuration and generally does not need to be modified', False), update)
     add_if_not_exist(Setting(
-        'v2_template_config', 'v2ray配置文件模板', __read_v2_template_config(), 'textarea',
-        '谨慎修改！！！请确保你对v2ray的配置非常熟悉，请不要删除关于api的配置', False), update)
+        'v2_template_config', 'v2ray config template', __read_v2_template_config(), 'textarea',
+        'Be careful modifying it!!! Make sure you are very familiar with the configuration of v2ray, please do not delete the configuration about api', False), update)
     add_if_not_exist(Setting(
-        'v2_config_check_interval', '账号生效时间（秒）', '60', 'int',
-        '数值过小会导致CPU使用率上升，填0或负数后果自负', True), update)
+        'v2_config_check_interval', 'Change Effective Time (seconds)', '60', 'int',
+        'Too small number can lead to increased CPU usage, fill 0 or negative at your own risk', True), update)
     add_if_not_exist(Setting(
-        'v2_restart_cmd', '重启v2ray命令', 'systemctl restart v2ray', 'text',
-        '当v2ray需重启时，面板会自动运行此命令来重启v2ray，一般无需修改', False), update)
+        'v2_restart_cmd', 'Command to restart v2ray', 'systemctl restart v2ray', 'text',
+        'When v2ray needs to be restarted, the panel will automatically run this command to restart v2ray, generally without modification', False), update)
     add_if_not_exist(Setting(
-        'traffic_job_interval', '统计流量间隔时间（秒）', '60', 'int',
-        '数值过小会导致CPU使用率上升，填0或负数后果自负', True), update)
+        'traffic_job_interval', 'Statistical traffic interval time (seconds)', '60', 'int',
+        'Too small number can lead to increased CPU usage, fill 0 or negative at your own risk', True), update)
     add_if_not_exist(Setting('secret_key', '', os.urandom(24), 'text', '', True), False)
     db.session.commit()
 
