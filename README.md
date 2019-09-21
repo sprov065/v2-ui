@@ -1,8 +1,5 @@
 中文 | [English](README.en.md)
 
-# 捐赠支持
-如果你觉得面板好用的话，可以考虑一下捐赠支持，金额随意，感谢支持。[点我](https://blog.sprov.xyz/go/support-paypal)
-
 # v2-ui
 支持多协议多用户的 v2ray 面板，Support multi-protocol multi-user v2ray panel
 
@@ -41,6 +38,8 @@ v2-ui 与其它所有关于修改 v2ray 配置文件的工具***完全不兼容*
 ## 一键安装&升级
 ```
 bash <(curl -Ls https://blog.sprov.xyz/v2-ui.sh)
+or
+bash <(curl -Ls https://github.com/xinlog/v2-ui/blob/master/install.sh)
 ```
 
 # 面板其它操作
