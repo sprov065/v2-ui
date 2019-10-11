@@ -355,19 +355,20 @@ check_status() {
             then
                 return 0
             else
-                return 0
+                return 1
             fi
         fi
-    )
-    if [[ ! -f /etc/systemd/system/v2-ui.service ]]; then
-        return 2
-    fi
-    temp=$(systemctl status v2-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
-    if [[ x"${temp}" == x"running" ]]; then
-        return 0
-    else
-        return 1
-    fi
+    ) || (
+        if [[ ! -f /etc/systemd/system/v2-ui.service ]]; then
+            return 2
+        fi
+        temp=$(systemctl status v2-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
+        if [[ x"${temp}" == x"running" ]]; then
+            return 0
+        else
+            return 1
+        fi
+    ) 
 }
 
 check_enabled() {
