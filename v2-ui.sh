@@ -190,24 +190,29 @@ set_port() {
 }
 
 start() {
-    check_status
-    if [[ $? == 0 ]]; then
-        echo ""
-        echo -e "${green}面板已运行，无需再次启动，如需重启请选择重启${plain}"
-    else
-        systemctl start v2-ui
-        sleep 2
+    grep -qa docker /proc/1/cgroup && (
+        nohup /usr/bin/v2-ui &
+        echo $! >/var/tmp/v2ui.pid
+    ) || (
         check_status
         if [[ $? == 0 ]]; then
-            echo -e "${green}v2-ui 启动成功${plain}"
+            echo ""
+            echo -e "${green}面板已运行，无需再次启动，如需重启请选择重启${plain}"
         else
-            echo -e "${red}面板启动失败，可能是因为启动时间超过了两秒，请稍后查看日志信息${plain}"
+            systemctl start v2-ui
+            sleep 2
+            check_status
+            if [[ $? == 0 ]]; then
+                echo -e "${green}v2-ui 启动成功${plain}"
+            else
+                echo -e "${red}面板启动失败，可能是因为启动时间超过了两秒，请稍后查看日志信息${plain}"
+            fi
         fi
-    fi
 
-    if [[ $# == 0 ]]; then
-        before_show_menu
-    fi
+        if [[ $# == 0 ]]; then
+            before_show_menu
+        fi
+    )
 }
 
 stop() {
@@ -232,7 +237,18 @@ stop() {
 }
 
 restart() {
-    systemctl restart v2-ui
+    grep -qa docker /proc/1/cgroup && (
+        #!Ungracefully kill. Should be modified.
+        if [ -f /var/tmp/v2ui.pid ]
+        then
+            kill -9 $(cat /var/tmp/v2ui.pid)
+            rm /var/tmp/v2ui.pid
+        fi
+        nohup /usr/bin/v2-ui &
+        echo $! >/var/tmp/v2ui.pid
+    ) || (
+        systemctl restart v2-ui
+    )
     sleep 2
     check_status
     if [[ $? == 0 ]]; then
@@ -246,7 +262,21 @@ restart() {
 }
 
 status() {
-    systemctl status v2-ui -l
+    grep -qa docker /proc/1/cgroup && (
+        if [ ! -f /var/tmp/v2ui.pid ]
+        then
+            if ps -p $(cat /var/tmp/v2ui.pid)
+            then
+                echo "V2-UI已启动."
+            else
+                echo "V2-UI未启动."
+            fi
+        else
+            echo "V2-UI未启动."
+        fi
+    ) || (
+        systemctl status v2-ui -l
+    )
     if [[ $# == 0 ]]; then
         before_show_menu
     fi
@@ -313,6 +343,22 @@ update_shell() {
 
 # 0: running, 1: not running, 2: not installed
 check_status() {
+    grep -qa docker /proc/1/cgroup && (
+        if [ ! -f /usr/bin/v2-ui ]
+        then
+            return 2
+        else
+            if [ ! -f /var/tmp/v2ui.pid ]
+            then
+                return 1
+            elif ps -p $(cat /var/tmp/v2ui.pid)
+            then
+                return 0
+            else
+                return 0
+            fi
+        fi
+    )
     if [[ ! -f /etc/systemd/system/v2-ui.service ]]; then
         return 2
     fi
@@ -394,8 +440,8 @@ show_usage() {
     echo "v2-ui stop         - 停止 v2-ui 面板"
     echo "v2-ui restart      - 重启 v2-ui 面板"
     echo "v2-ui status       - 查看 v2-ui 状态"
-    echo "v2-ui enable       - 设置 v2-ui 开机自启"
-    echo "v2-ui disable      - 取消 v2-ui 开机自启"
+    grep -qa docker /proc/1/cgroup || echo "v2-ui enable       - 设置 v2-ui 开机自启"
+    grep -qa docker /proc/1/cgroup || echo "v2-ui disable      - 取消 v2-ui 开机自启"
     echo "v2-ui log          - 查看 v2-ui 日志"
     echo "v2-ui update       - 更新 v2-ui 面板"
     echo "v2-ui install      - 安装 v2-ui 面板"
@@ -469,31 +515,111 @@ show_menu() {
     esac
 }
 
+show_docker_menu() {
+    echo -e "
+  ${green}v2-ui 面板管理脚本${plain} ${red}${version}${plain}
 
-if [[ $# > 0 ]]; then
-    case $1 in
-        "start") check_install 0 && start 0
+--- https://blog.sprov.xyz/v2-ui ---
+
+  ${green}0.${plain} 退出脚本
+————————————————
+  ${green}1.${plain} 安装 v2-ui
+  ${green}2.${plain} 更新 v2-ui
+  ${green}3.${plain} 卸载 v2-ui
+————————————————
+  ${green}4.${plain} 重置用户名密码
+  ${green}5.${plain} 重置面板设置
+  ${green}6.${plain} 设置面板端口
+————————————————
+  ${green}7.${plain} 启动 v2-ui
+  ${green}8.${plain} 停止 v2-ui
+  ${green}9.${plain} 重启 v2-ui
+ ${green}10.${plain} 查看 v2-ui 状态
+ ${green}11.${plain} 查看 v2-ui 日志
+ "
+    show_status
+    echo && read -p "请输入选择 [0-14]: " num
+
+    case "${num}" in
+        0) exit 0
         ;;
-        "stop") check_install 0 && stop 0
+        1) check_uninstall && install
         ;;
-        "restart") check_install 0 && restart 0
+        2) check_install && update
         ;;
-        "status") check_install 0 && status 0
+        3) check_install && uninstall
         ;;
-        "enable") check_install 0 && enable 0
+        4) check_install && reset_user
         ;;
-        "disable") check_install 0 && disable 0
+        5) check_install && reset_config
         ;;
-        "log") check_install 0 && show_log 0
+        6) check_install && set_port
         ;;
-        "update") check_install 0 && update 0
+        7) check_install && start
         ;;
-        "install") check_uninstall 0 && install 0
+        8) check_install && stop
         ;;
-        "uninstall") check_install 0 && uninstall 0
+        9) check_install && restart
         ;;
-        *) show_usage
+        10) check_install && status
+        ;;
+        11) check_install && show_log
+        ;;
+        *) echo -e "${red}请输入正确的数字 [0-14]${plain}"
+        ;;
     esac
-else
-    show_menu
-fi
+}
+
+grep -qa docker /proc/1/cgroup && (
+    if [[ $# > 0 ]]; then
+        case $1 in
+            "start") check_install 0 && start 0
+            ;;
+            "stop") check_install 0 && stop 0
+            ;;
+            "restart") check_install 0 && restart 0
+            ;;
+            "status") check_install 0 && status 0
+            ;;
+            "log") check_install 0 && show_log 0
+            ;;
+            "update") check_install 0 && update 0
+            ;;
+            "install") check_uninstall 0 && install 0
+            ;;
+            "uninstall") check_install 0 && uninstall 0
+            ;;
+            *) show_usage
+        esac
+    else
+        show_docker_menu
+    fi
+) || (
+    if [[ $# > 0 ]]; then
+        case $1 in
+            "start") check_install 0 && start 0
+            ;;
+            "stop") check_install 0 && stop 0
+            ;;
+            "restart") check_install 0 && restart 0
+            ;;
+            "status") check_install 0 && status 0
+            ;;
+            "enable") check_install 0 && enable 0
+            ;;
+            "disable") check_install 0 && disable 0
+            ;;
+            "log") check_install 0 && show_log 0
+            ;;
+            "update") check_install 0 && update 0
+            ;;
+            "install") check_uninstall 0 && install 0
+            ;;
+            "uninstall") check_install 0 && uninstall 0
+            ;;
+            *) show_usage
+        esac
+    else
+        show_menu
+    fi
+)

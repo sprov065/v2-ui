@@ -57,6 +57,7 @@ install_base() {
     if [[ x"${release}" == x"centos" ]]; then
         yum install wget curl tar -y
     else
+        apt update
         apt install wget curl tar procps -y
     fi
 }
@@ -70,6 +71,60 @@ install_v2ray() {
     fi
     systemctl enable v2ray
     systemctl start v2ray
+}
+
+install_docker_v2ray() {
+    echo -e "${green}开始安装or升级v2ray${plain}"
+    bash <(curl -L -s https://install.direct/go.sh)
+    if [[ $? -ne 0 ]]; then
+        echo -e "${red}v2ray安装或升级失败，请检查错误信息${plain}"
+        exit 1
+    fi
+    #Auto-startup is NOT POSSIBLE in docker without apporiate exec.
+    nohup v2ray -config /etc/v2ray/config.json &
+    echo $! >/var/tmp/v2ray.pid
+}
+
+install_docker_v2-ui() {
+    cd /usr/local/
+    if [[ -e /usr/local/v2-ui/ ]]; then
+        rm /usr/local/v2-ui/ -rf
+    fi
+    last_version=$(curl -Ls "https://api.github.com/repos/sprov065/v2-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    echo -e "检测到v2-ui最新版本：${last_version}，开始安装"
+    wget -N --no-check-certificate -O /usr/local/v2-ui-linux.tar.gz https://github.com/sprov065/v2-ui/releases/download/${last_version}/v2-ui-linux.tar.gz
+    if [[ $? -ne 0 ]]; then
+        echo -e "${red}下载v2-ui失败，请确保你的服务器能够下载Github的文件，如果多次安装失败，请参考手动安装教程${plain}"
+        exit 1
+    fi
+    wget -N --no-check-certificate -O /usr/bin/systemctl https://raw.githubusercontent.com/sprov065/v2-ui/master/fakesysteminfo.sh
+    tar zxvf v2-ui-linux.tar.gz
+    rm v2-ui-linux.tar.gz -f
+    cd v2-ui
+    chmod +x v2-ui
+    rm v2-ui.service
+    echo -e "${green}v2-ui v${last_version}${plain} 安装完成，面板已启动，"
+    echo -e ""
+    echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
+    echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
+    echo -e "${yellow}同时, 请确保docker将65432端口映射到主机上。${plain}"
+    echo -e ""
+    echo -e "如果是更新面板，则按你之前的方式访问面板"
+    echo -e ""
+    curl -o /usr/bin/v2-ui -Ls https://raw.githubusercontent.com/sprov065/v2-ui/master/v2-ui.sh
+    chmod +x /usr/bin/v2-ui
+    echo -e "v2-ui 管理脚本使用方法: "
+    echo -e "----------------------------------------------"
+    echo -e "v2-ui              - 显示管理菜单 (功能更多)"
+    echo -e "v2-ui start        - 启动 v2-ui 面板"
+    echo -e "v2-ui stop         - 停止 v2-ui 面板"
+    echo -e "v2-ui restart      - 重启 v2-ui 面板"
+    echo -e "v2-ui status       - 查看 v2-ui 状态"
+    echo -e "v2-ui log          - 查看 v2-ui 日志"
+    echo -e "v2-ui update       - 更新 v2-ui 面板"
+    echo -e "v2-ui install      - 安装 v2-ui 面板"
+    echo -e "v2-ui uninstall    - 卸载 v2-ui 面板"
+    echo -e "----------------------------------------------"
 }
 
 close_firewall() {
@@ -133,6 +188,15 @@ install_v2-ui() {
 }
 
 echo -e "${green}开始安装${plain}"
+
 install_base
-install_v2ray
-install_v2-ui
+
+# Check if the shell is executed inside a docker container
+grep -qa docker /proc/1/cgroup && (
+    echo -e "${red}警告: Docker容器版v2-ui处于实验性阶段. 与此同时, Docker内安装的v2-ui无法自启动。请手动执行\'v2-ui start\'来启动.${plain}"
+    install_docker_v2ray
+    install_docker_v2-ui
+) || (
+    install_v2ray
+    install_v2-ui
+)
