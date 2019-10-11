@@ -343,32 +343,43 @@ update_shell() {
 
 # 0: running, 1: not running, 2: not installed
 check_status() {
-    grep -qa docker /proc/1/cgroup && (
-        if [ ! -f /usr/bin/v2-ui ]
+    if grep -qa docker /proc/1/cgroup; then
+        check_status_docker
+        result=$?
+    else
+        check_status_normal
+        result=$?
+    fi
+    return $?
+}
+
+check_status_normal() {
+    if [[ ! -f /etc/systemd/system/v2-ui.service ]]; then
+        return 2
+    fi
+    temp=$(systemctl status v2-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
+    if [[ x"${temp}" == x"running" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_status_docker() {
+    if [ ! -f /usr/bin/v2-ui ]
+    then
+        return 2
+    else
+        if [ ! -f /var/tmp/v2ui.pid ]
         then
-            return 2
-        else
-            if [ ! -f /var/tmp/v2ui.pid ]
-            then
-                return 1
-            elif ps -p $(cat /var/tmp/v2ui.pid)
-            then
-                return 0
-            else
-                return 1
-            fi
-        fi
-    ) || (
-        if [[ ! -f /etc/systemd/system/v2-ui.service ]]; then
-            return 2
-        fi
-        temp=$(systemctl status v2-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
-        if [[ x"${temp}" == x"running" ]]; then
+            return 1
+        elif ps -p $(cat /var/tmp/v2ui.pid)
+        then
             return 0
         else
             return 1
         fi
-    ) 
+    fi
 }
 
 check_enabled() {
