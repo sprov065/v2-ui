@@ -191,7 +191,7 @@ set_port() {
 
 start() {
     grep -qa docker /proc/1/cgroup && (
-        nohup /usr/bin/v2-ui &
+        nohup /usr/local/v2-ui/v2-ui &
         echo $! >/var/tmp/v2ui.pid
     ) || (
         check_status
