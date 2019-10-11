@@ -57,7 +57,7 @@ install_base() {
     if [[ x"${release}" == x"centos" ]]; then
         yum install wget curl tar -y
     else
-        apt install wget curl tar -y
+        apt install wget curl tar procps -y
     fi
 }
 
