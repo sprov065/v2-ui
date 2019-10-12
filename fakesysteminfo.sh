@@ -50,4 +50,4 @@ elif [ "${1}" == "stop" ]
         fi
     fi
     return 0
-elif
+fi
