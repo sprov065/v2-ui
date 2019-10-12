@@ -42,6 +42,7 @@ then
     echo $! >/var/tmp/v2ray.pid
     return 0
 elif [ "${1}" == "stop" ]
+then
     if [ -f /var/tmp/v2ray.pid ]
     then
         if ps -p $(cat /var/tmp/v2ray.pid)
