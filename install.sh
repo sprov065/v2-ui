@@ -81,7 +81,7 @@ install_docker_v2ray() {
         exit 1
     fi
     #Auto-startup is NOT POSSIBLE in docker without apporiate exec.
-    nohup v2ray -config /etc/v2ray/config.json &
+    nohup /usr/bin/v2ray/v2ray -config /etc/v2ray/config.json &
     echo $! >/var/tmp/v2ray.pid
 }
 

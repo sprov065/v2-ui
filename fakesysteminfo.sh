@@ -9,11 +9,11 @@ then
         then
             return 0
         else
-            nohup v2ray -config /etc/v2ray/config.json &
+            nohup /usr/bin/v2ray/v2ray -config /etc/v2ray/config.json &
             echo $! >/var/tmp/v2ray.pid
         fi
     else
-        nohup v2ray -config /etc/v2ray/config.json &
+        nohup /usr/bin/v2ray/v2ray -config /etc/v2ray/config.json &
         echo $! >/var/tmp/v2ray.pid
     fi
 elif [ "${1}" == "is-active" ]
