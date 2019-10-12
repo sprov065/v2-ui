@@ -193,7 +193,7 @@ install_base
 
 # Check if the shell is executed inside a docker container
 grep -qa docker /proc/1/cgroup && (
-    echo -e "${red}警告: Docker容器版v2-ui处于实验性阶段. 与此同时, Docker内安装的v2-ui无法自启动。请手动执行\'v2-ui start\'来启动.${plain}"
+    echo -e "${red}警告: Docker容器版v2-ui处于实验性阶段. 与此同时, Docker内安装的v2-ui无法自启动。请手动执行'v2-ui start'来启动.${plain}"
     install_docker_v2ray
     install_docker_v2-ui
 ) || (
