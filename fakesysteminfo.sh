@@ -38,7 +38,7 @@ then
             kill -9 $(cat /var/tmp/v2ray.pid)
         fi
     fi
-    nohup v2ray -config /etc/v2ray/config.json &
+    nohup /usr/bin/v2ray/v2ray -config /etc/v2ray/config.json &
     echo $! >/var/tmp/v2ray.pid
     return 0
 elif [ "${1}" == "stop" ]
@@ -52,3 +52,4 @@ then
     fi
     return 0
 fi
+return 0
