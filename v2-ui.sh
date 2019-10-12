@@ -244,7 +244,7 @@ restart() {
             kill -9 $(cat /var/tmp/v2ui.pid)
             rm /var/tmp/v2ui.pid
         fi
-        nohup /usr/bin/v2-ui &
+        nohup /usr/local/v2-ui/v2-ui &
         echo $! >/var/tmp/v2ui.pid
     ) || (
         systemctl restart v2-ui
