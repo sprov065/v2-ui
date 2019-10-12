@@ -383,6 +383,9 @@ check_status_docker() {
 }
 
 check_enabled() {
+    if grep -qa docker /proc/1/cgroup; then
+        return 0
+    fi
     temp=$(systemctl is-enabled v2-ui)
     if [[ x"${temp}" == x"enabled" ]]; then
         return 0
