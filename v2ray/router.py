@@ -2,6 +2,7 @@ import json
 
 from flask import Blueprint, render_template, jsonify, request
 from flask_babel import gettext
+from sqlalchemy import and_
 
 from base.models import Msg
 from init import db
@@ -83,6 +84,8 @@ def update_inbound(in_id):
     port = request.form.get('port')
     add_if_not_none(update, 'port', port)
     if port:
+        if Inbound.query.filter(and_(Inbound.id != in_id, Inbound.port == port)).count() > 0:
+            return jsonify(Msg(False, gettext('port exists')))
         add_if_not_none(update, 'tag', 'inbound-' + port)
     add_if_not_none(update, 'listen', request.form.get('listen'))
     add_if_not_none(update, 'protocol', request.form.get('protocol'))

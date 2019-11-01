@@ -11,6 +11,7 @@ __last_access = time.time()
 __last_get = time.time()
 __access_interval = 0
 __get_interval = 0
+__last_ct = psutil.cpu_times()
 
 
 def get_status():
@@ -65,9 +66,6 @@ def uptime():
     __status['uptime'] = time.time() - psutil.boot_time()
 
 
-__last_ct = psutil.cpu_times()
-
-
 def cpu():
     global __last_ct
     cur_ct = psutil.cpu_times()
@@ -78,7 +76,10 @@ def cpu():
     total = cur_total - last_total
     idle = cur_ct.idle - __last_ct.idle
 
-    percent = (total - idle) / total * 100
+    if total <= 0:
+        percent = 0
+    else:
+        percent = (total - idle) / total * 100
     __last_ct = cur_ct
     __status['cpu'] = {
         'percent': percent

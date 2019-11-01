@@ -44,8 +44,7 @@
         <!-- select stream network -->
         <a-form layout="inline">
             <a-form-item label="{{ _('transport') }}">
-                <a-select v-model="inModal.inbound.stream.network"
-                          @change="value => value === 'http' ? inModal.inbound.stream.security = 'tls' : ''">
+                <a-select v-model="inModal.inbound.stream.network">
                     <a-select-option value="tcp">tcp</a-select-option>
                     <a-select-option value="kcp">kcp</a-select-option>
                     <a-select-option value="ws">ws</a-select-option>
@@ -322,8 +321,7 @@
                     && ['tcp', 'ws', 'http', 'quic'].indexOf(inModal.inbound.stream.network) >= 0">
 
         <!-- tls enable -->
-        <a-form v-if="['tcp', 'ws', 'quic'].indexOf(inModal.inbound.stream.network) >= 0"
-                layout="inline">
+        <a-form layout="inline">
             <a-form-item label="tls">
                 <a-switch
                         :checked="inModal.inbound.stream.security === 'tls'"

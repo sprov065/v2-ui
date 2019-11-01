@@ -5,6 +5,7 @@ from flask_babel import gettext
 from base.models import Msg, User
 from init import db
 from util import server_info, config
+from util import v2_jobs
 
 server_bp = Blueprint('server', __name__, url_prefix='/server')
 
@@ -28,6 +29,8 @@ def update_setting(setting_id):
     value = request.form['value']
     value_type = request.form['value_type']
     config.update_setting(setting_id, key, name, value, value_type)
+    if key == 'v2_template_config':
+        v2_jobs.__v2_config_changed = True
     return jsonify(Msg(True, gettext('update success, please determine if you need to restart the panel.')))
 
 

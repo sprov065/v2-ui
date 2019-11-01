@@ -62,6 +62,12 @@
                     <a-col :sm="24" :md="12">
                         <a-card hoverable>
                             v2ray {{ _('status') }}：<a-tag :color="status.v2.color">[[ status.v2.stat ]]</a-tag>
+                            <a-tooltip v-if="status.v2.stat === '{{ _('error') }}'">
+                                <template slot="title">
+                                    出现此错误可能是由于账号信息配置错误导致 v2ray 无法启动，请仔细检查账号信息是否错误，或者根据 v2ray 的错误信息判断原因。如果 v2ray 确定在运行，且账号确定能使用，那么忽略这个错误信息。
+                                </template>
+                                <a-icon type="question-circle" theme="filled"></a-icon>
+                            </a-tooltip>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
