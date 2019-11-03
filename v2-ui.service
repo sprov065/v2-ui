@@ -5,7 +5,7 @@ Wants=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/v2-ui/bin/python /usr/local/v2-ui/v2-ui/v2-ui.py
+ExecStart=/usr/local/v2-ui/v2-ui
 
 [Install]
 WantedBy=multi-user.target
