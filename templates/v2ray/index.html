@@ -30,7 +30,7 @@
                                         <a-progress type="dashboard" status="normal"
                                                     :stroke-color="status.memory.color"
                                                     :percent="status.memory.percent"></a-progress>
-                                        <div>{{ _('memory') }}：[[ sizeFormat(status.memory.used) ]] /
+                                        <div>{{ _('memory') }}: [[ sizeFormat(status.memory.used) ]] /
                                             [[ sizeFormat(status.memory.total) ]]</div>
                                     </a-col>
                                 </a-row>
@@ -41,14 +41,14 @@
                                         <a-progress type="dashboard" status="normal"
                                                     :stroke-color="status.swap.color"
                                                     :percent="status.swap.percent"></a-progress>
-                                        <div>swap：[[ sizeFormat(status.swap.used) ]] /
+                                        <div>swap: [[ sizeFormat(status.swap.used) ]] /
                                             [[ sizeFormat(status.swap.total) ]]</div>
                                     </a-col>
                                     <a-col :span="12" style="text-align: center">
                                         <a-progress type="dashboard" status="normal"
                                                     :stroke-color="status.disk.color"
                                                     :percent="status.disk.percent"></a-progress>
-                                        <div>{{ _('disk') }}：[[ sizeFormat(status.disk.used) ]] /
+                                        <div>{{ _('disk') }}: [[ sizeFormat(status.disk.used) ]] /
                                             [[ sizeFormat(status.disk.total) ]]</div>
                                     </a-col>
                                 </a-row>
@@ -61,10 +61,12 @@
                 <a-row>
                     <a-col :sm="24" :md="12">
                         <a-card hoverable>
-                            v2ray {{ _('status') }}：<a-tag :color="status.v2.color">[[ status.v2.stat ]]</a-tag>
+                            v2ray {{ _('status') }}: <a-tag :color="status.v2.color">[[ status.v2.stat ]]</a-tag>
                             <a-tooltip v-if="status.v2.stat === '{{ _('error') }}'">
                                 <template slot="title">
-                                    出现此错误可能是由于账号信息配置错误导致 v2ray 无法启动，请仔细检查账号信息是否错误，或者根据 v2ray 的错误信息判断原因。如果 v2ray 确定在运行，且账号确定能使用，那么忽略这个错误信息。
+                                    <p>{{ _('May be due to account information configuration error caused by v2ray startup failure.') }}</p>
+                                    <p>{{ _('Check the account information and the v2ray configuration template for errors, or determine the cause based on the v2ray error message.') }}</p>
+                                    <p>{{ _('If v2ray is running and all accounts are available, ignore this error..') }}</p>
                                 </template>
                                 <a-icon type="question-circle" theme="filled"></a-icon>
                             </a-tooltip>
@@ -72,17 +74,29 @@
                     </a-col>
                     <a-col :sm="24" :md="12">
                         <a-card hoverable>
-                            {{ _('uptime') }}：<a-tag color="#87d068">[[ status.uptime ]]</a-tag>
+                            {{ _('uptime') }}: <a-tag color="#87d068">[[ status.uptime ]]</a-tag>
+                            <a-tooltip>
+                                <template slot="title">
+                                    {{ _('The running time of the system since boot.') }}
+                                </template>
+                                <a-icon type="question-circle" theme="filled"></a-icon>
+                            </a-tooltip>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
                         <a-card hoverable>
-                            {{ _('loads') }}：[[ status.loads[0] ]] | [[ status.loads[1] ]] | [[ status.loads[2] ]]
+                            {{ _('loads') }}: [[ status.loads[0] ]] | [[ status.loads[1] ]] | [[ status.loads[2] ]]
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
                         <a-card hoverable>
-                            tcp / udp {{ _('connections') }}：[[ status.tcp_count ]] / [[ status.udp_count ]]
+                            tcp / udp {{ _('connections') }}: [[ status.tcp_count ]] / [[ status.udp_count ]]
+                            <a-tooltip>
+                                <template slot="title">
+                                    {{ _('The number of connections for the entire system, not v2ray.') }}
+                                </template>
+                                <a-icon type="question-circle" theme="filled"></a-icon>
+                            </a-tooltip>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
@@ -90,9 +104,21 @@
                             <a-row>
                                 <a-col :span="12">
                                     <a-icon type="arrow-up"></a-icon> [[ status.net_io.up ]] / S
+                                    <a-tooltip>
+                                        <template slot="title">
+                                            {{ _('Total upload speed of all NICs.') }}
+                                        </template>
+                                        <a-icon type="question-circle" theme="filled"></a-icon>
+                                    </a-tooltip>
                                 </a-col>
                                 <a-col :span="12">
                                     <a-icon type="arrow-down"></a-icon> [[ status.net_io.down ]] / S
+                                    <a-tooltip>
+                                        <template slot="title">
+                                            {{ _('Total download speed of all NICs.') }}
+                                        </template>
+                                        <a-icon type="question-circle" theme="filled"></a-icon>
+                                    </a-tooltip>
                                 </a-col>
                             </a-row>
                         </a-card>
@@ -102,9 +128,21 @@
                             <a-row>
                                 <a-col :span="12">
                                     <a-icon type="cloud-upload"></a-icon> [[ status.net_traffic.sent ]]
+                                    <a-tooltip>
+                                        <template slot="title">
+                                            {{ _('Total upload traffic for all NICs since boot.') }}
+                                        </template>
+                                        <a-icon type="question-circle" theme="filled"></a-icon>
+                                    </a-tooltip>
                                 </a-col>
                                 <a-col :span="12">
                                     <a-icon type="cloud-download"></a-icon> [[ status.net_traffic.recv ]]
+                                    <a-tooltip>
+                                        <template slot="title">
+                                            {{ _('Total download traffic for all NICs since boot.') }}
+                                        </template>
+                                        <a-icon type="question-circle" theme="filled"></a-icon>
+                                    </a-tooltip>
                                 </a-col>
                             </a-row>
                         </a-card>

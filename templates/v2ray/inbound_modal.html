@@ -16,7 +16,16 @@
                 <a-select-option v-for="p in Protocols" :key="p" :value="p">[[ p ]]</a-select-option>
             </a-select>
         </a-form-item>
-        <a-form-item label="{{ _('listening IP') }}">
+        <a-form-item>
+            <span slot="label">
+                {{ _('listening IP') }}
+                <a-tooltip>
+                    <template slot="title">
+                        {{ _('If you don\'t fully understand its purpose, leave it at the default.') }}
+                    </template>
+                    <a-icon type="question-circle" theme="filled"></a-icon>
+                </a-tooltip>
+            </span>
             <a-input v-model.trim="inModal.inbound.listen"></a-input>
         </a-form-item>
         <a-form-item label="{{ _('port') }}">
@@ -35,6 +44,26 @@
         </a-form-item>
         <a-form-item label="{{ _('disable insecure encryption') }}">
             <a-switch v-model.number="inModal.inbound.settings.disableInsecure"></a-switch>
+        </a-form-item>
+    </a-form>
+
+    <!-- shadowsocks -->
+    <a-form v-if="inModal.inbound.protocol === Protocols.SHADOWSOCKS"
+            layout="inline">
+        <a-form-item label="{{ _('method') }}">
+            <a-select v-model="inModal.inbound.settings.method" style="width: 165px;">
+                <a-select-option v-for="method in SSMethods" :value="method">[[ method ]]</a-select-option>
+            </a-select>
+        </a-form-item>
+        <a-form-item label="{{ _('password') }}">
+            <a-input v-model.trim="inModal.inbound.settings.password"></a-input>
+        </a-form-item>
+        <a-form-item label="{{ _('network') }}">
+            <a-select v-model="inModal.inbound.settings.network" style="width: 100px;">
+                <a-select-option value="tcp,udp">tcp+udp</a-select-option>
+                <a-select-option value="tcp">tcp</a-select-option>
+                <a-select-option value="udp">udp</a-select-option>
+            </a-select>
         </a-form-item>
     </a-form>
 
@@ -242,26 +271,6 @@
             </a-form-item>
         </a-form>
     </template>
-
-    <!-- shadowsocks -->
-    <a-form v-if="inModal.inbound.protocol === Protocols.SHADOWSOCKS"
-            layout="inline">
-        <a-form-item label="{{ _('method') }}">
-            <a-select v-model="inModal.inbound.settings.method" style="width: 165px;">
-                <a-select-option v-for="method in SSMethods" :value="method">[[ method ]]</a-select-option>
-            </a-select>
-        </a-form-item>
-        <a-form-item label="{{ _('password') }}">
-            <a-input v-model.trim="inModal.inbound.settings.password"></a-input>
-        </a-form-item>
-        <a-form-item label="{{ _('network') }}">
-            <a-select v-model="inModal.inbound.settings.network" style="width: 100px;">
-                <a-select-option value="tcp,udp">tcp+udp</a-select-option>
-                <a-select-option value="tcp">tcp</a-select-option>
-                <a-select-option value="udp">udp</a-select-option>
-            </a-select>
-        </a-form-item>
-    </a-form>
 
     <!-- dokodemo-door -->
     <a-form v-if="inModal.inbound.protocol === Protocols.DOKODEMO"

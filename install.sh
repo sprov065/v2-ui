@@ -29,6 +29,11 @@ else
     echo -e "${red}未检测到系统版本，请联系脚本作者！${plain}\n" && exit 1
 fi
 
+if [ $(getconf WORD_BIT) != '32' ] && [ $(getconf LONG_BIT) != '64' ] ; then
+    echo "本软件不支持 32 位系统(x86)，请使用 64 位系统(x86_64)，如果检测有误，请联系作者"
+    exit -1
+fi
+
 os_version=""
 
 # os version
