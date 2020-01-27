@@ -10,18 +10,24 @@
         title: '',
         content: '',
         okText: '',
+        copyText: '',
         qrcode: null,
         clipboard: null,
         visible: false,
-        show: function (title='', content='', okText='{{ _('copy') }}') {
+        show: function (title='', content='', okText='{{ _('copy') }}', copyText='') {
             this.title = title;
             this.content = content;
             this.okText = okText;
+            if (isEmpty(copyText)) {
+                this.copyText = content;
+            } else {
+                this.copyText = copyText;
+            }
             this.visible = true;
             qrModalApp.$nextTick(() => {
                 if (this.clipboard === null) {
                     this.clipboard = new ClipboardJS('#qr-modal-ok-btn', {
-                        text: () => this.content,
+                        text: () => this.copyText,
                     });
                     this.clipboard.on('success', () => app.$message.success('{{ _('copied') }}'));
                 }

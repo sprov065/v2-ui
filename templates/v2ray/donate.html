@@ -1,0 +1,102 @@
+{% extends 'v2ray/base.html' %}
+{% block title %}{{ _('clients') }}{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style>
+        .ant-divider-horizontal {
+            margin: 12px 0;
+        }
+
+        .ant-card:last-of-type {
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+
+    <a-layout id="app" v-cloak>
+        {% include 'v2ray/common_sider.html' %}
+        <a-layout id="content-layout">
+            <a-layout-content>
+                <a-card>
+                    <div>
+                        开源免费软件离不开大家的支持，您的支持将是我前进的动力
+                    </div>
+                    <a-divider></a-divider>
+                    <div>
+                        PayPal {{ _('donate') }} :
+                        <a href="https://paypal.me/sprovblog/1" target="_blank">
+                            $1
+                        </a>
+                        <a-divider type="vertical"></a-divider>
+                        <a href="https://paypal.me/sprovblog/2" target="_blank">
+                            $2
+                        </a>
+                        <a-divider type="vertical"></a-divider>
+                        <a href="https://paypal.me/sprovblog/5" target="_blank">
+                            $5
+                        </a>
+                        <a-divider type="vertical"></a-divider>
+                        <a href="https://paypal.me/sprovblog/10" target="_blank">
+                            $10
+                        </a>
+                        <a-divider type="vertical"></a-divider>
+                        <a-input type="number" placeholder="{{ _('custom') }}"
+                                 v-model="payPal"
+                                 size="small" style="width: 100px"></a-input>
+                        <a-button type="primary" size="small" @click="payPalCustom()">{{ _('confirm') }}</a-button>
+                    </div>
+                    <a-divider></a-divider>
+                    <div>
+                        以太坊 (ETH) :
+                        <a href="javascript:void(0)"
+                           @click="qrcode('以太坊 (ETH)',
+                           '0xa77579db35ad766844d41aca541d658349268012',
+                           '0xa77579db35ad766844d41aca541d658349268012')">
+                            {{ _('show') }}
+                        </a>
+                    </div>
+                    <a-divider></a-divider>
+                    <div>
+                        比特币 (BTC) :
+                        <a href="javascript:void(0)"
+                           @click="qrcode('比特币 (BTC)',
+                           'bitcoin:bc1qemdf5vdz8cq07cdcqzhvzewy35994cxt7gnrpegaz8txwxfp2ysqtfw6hh',
+                           'bc1qemdf5vdz8cq07cdcqzhvzewy35994cxt7gnrpegaz8txwxfp2ysqtfw6hh')">
+                            {{ _('show') }}
+                        </a>
+                    </div>
+                    <a-divider></a-divider>
+                </a-card>
+            </a-layout-content>
+        </a-layout>
+    </a-layout>
+
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+
+        let app = new Vue({
+            delimiters: ['[[', ']]'],
+            el: '#app',
+            data: {
+                payPal: '',
+            },
+            methods: {
+                payPalCustom() {
+                    if (isEmpty(this.payPal)) {
+                        this.$message.warning('{{ _('please input a number') }}');
+                        return;
+                    }
+                    open('https://paypal.me/sprovblog/' + this.payPal);
+                },
+                qrcode(title, content, copyText) {
+                    qrModal.show(title, content, '{{ _('copy') }}', copyText);
+                }
+            },
+        });
+
+    </script>
+    {% include 'common/qrcode_modal.html' %}
+{% endblock %}

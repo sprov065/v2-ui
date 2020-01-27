@@ -1,5 +1,5 @@
 <a-modal id="prompt-modal" v-model="promptModal.visible" :title="promptModal.title"
-         :closable="true" @ok="promptModal.ok"
+         :closable="true" @ok="promptModal.ok" :mask-closable="false"
          :ok-text="promptModal.okText" cancel-text="{{ _('cancel') }}">
     <a-input id="prompt-modal-input" :type="promptModal.type"
              v-model="promptModal.value"

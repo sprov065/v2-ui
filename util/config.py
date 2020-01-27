@@ -65,7 +65,7 @@ def get_key_file():
 
 
 def get_login_title():
-    return __get('login_title', '登录')
+    return __get('login_title', 'Sign in')
 
 
 def get_v2_config_path():
@@ -109,7 +109,7 @@ def get_secret_key():
 
 
 def get_current_version():
-    return '5.0.2'
+    return '5.1.1'
 
 
 def add_if_not_exist(setting, update=False):

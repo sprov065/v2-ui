@@ -40,6 +40,10 @@
                                         <a-tag color="green">[[ sizeFormat(total.up + total.down) ]]</a-tag>
                                     </a-popconfirm>
                                 </a-col>
+                                <a-col :xs="24" :sm="24" :lg="12">
+                                    {{ _('number of accounts') }}：
+                                    <a-tag color="green">[[ inbounds.length ]]</a-tag>
+                                </a-col>
                             </a-row>
                         </a-card>
                     </transition>

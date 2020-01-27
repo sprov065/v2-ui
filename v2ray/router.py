@@ -50,6 +50,12 @@ def tutorial():
     return render_template('v2ray/tutorial.html', **common_context)
 
 
+@v2ray_bp.route('/donate/', methods=['GET'])
+def donate():
+    from init import common_context
+    return render_template('v2ray/donate.html', **common_context)
+
+
 @v2ray_bp.route('/inbounds', methods=['GET'])
 def inbounds():
     return jsonify([inb.to_json() for inb in Inbound.query.all()])

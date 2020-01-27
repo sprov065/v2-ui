@@ -4,8 +4,7 @@ from flask_babel import gettext
 
 from base.models import Msg, User
 from init import db
-from util import server_info, config
-from util import v2_jobs
+from util import server_info, config, v2_jobs, file_util
 
 server_bp = Blueprint('server', __name__, url_prefix='/server')
 
@@ -28,6 +27,9 @@ def update_setting(setting_id):
     name = request.form['name']
     value = request.form['value']
     value_type = request.form['value_type']
+    if key == 'cert_file' or key == 'key_file':
+        if value and not file_util.is_file(value):
+            return jsonify(Msg(False, gettext(u'File <%(file)s> does not exist.', file=value)))
     config.update_setting(setting_id, key, name, value, value_type)
     if key == 'v2_template_config':
         v2_jobs.__v2_config_changed = True

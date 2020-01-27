@@ -513,9 +513,15 @@ class Sniffing extends V2CommonClass {
     }
 
     static fromJson(json={}) {
+        let destOverride = clone(json.destOverride);
+        if (!isArrEmpty(destOverride)) {
+            if (isEmpty(destOverride[0])) {
+                destOverride = ['http', 'tls'];
+            }
+        }
         return new Sniffing(
             !!json.enabled,
-            clone(json.destOverride),
+            destOverride,
         );
     }
 }

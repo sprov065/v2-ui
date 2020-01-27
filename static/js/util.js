@@ -6,33 +6,50 @@ window.isArrEmpty = arr => {
     return !isEmpty(arr) && arr.length === 0;
 };
 
-window.clone = function(obj) {
-    let newObj = obj instanceof Array ? [] : {};
-    for (let prop in obj) {
-        newObj[prop] = obj[prop];
+window.copyArr = (dest, src) => {
+    dest.splice(0);
+    for (const item of src) {
+        dest.push(item);
+    }
+};
+
+window.clone = obj => {
+    let newObj;
+    if (obj instanceof Array) {
+        newObj = [];
+        copyArr(newObj, obj);
+    } else if (obj instanceof Object) {
+        newObj = {};
+        for (const key of Object.keys(obj)) {
+            newObj[key] = obj[key];
+        }
+    } else {
+        newObj = obj;
     }
     return newObj;
 };
 
 window.deepClone = function(obj) {
-    let newObj = obj instanceof Array ? [] : {};
-    for (let prop in obj) {
-        let value = obj[prop];
-        newObj[prop] = typeof value === 'object' ? deepClone(value) : value;
+    let newObj;
+    if (obj instanceof Array) {
+        newObj = [];
+        for (const item of obj) {
+            newObj.push(deepClone(item));
+        }
+    } else if (obj instanceof Object) {
+        newObj = {};
+        for (const key of Object.keys(obj)) {
+            newObj[key] = deepClone(obj[key]);
+        }
+    } else {
+        newObj = obj;
     }
     return newObj;
 };
 
-window.execute = (func, ... args) => {
-    if (func !== undefined && typeof func === 'function') {
-        switch(args.length) {
-            case 0: func(); break;
-            case 1: func(args[0]); break;
-            case 2: func(args[0], args[1]); break;
-            case 3: func(args[0], args[1], args[2]); break;
-            case 4: func(args[0], args[1], args[2], args[3]); break;
-            default: func(args); break;
-        }
+window.execute = (func, ...args) => {
+    if (!isEmpty(func) && typeof func === 'function') {
+        func(...args);
     }
 };
 

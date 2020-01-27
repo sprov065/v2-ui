@@ -11,3 +11,7 @@ def touch(filename):
     if not os.path.exists(filename):
         with open(filename, 'w') as f:
             f.write('')
+
+
+def is_file(filename):
+    return os.path.isfile(filename)

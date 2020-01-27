@@ -13,7 +13,7 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
-version="v1.0.0"
+version="v1.0.1"
 
 # check root
 [[ $EUID -ne 0 ]] && echo -e "${red}错误: ${plain} 必须使用root用户运行此脚本！\n" && exit 1
@@ -311,6 +311,20 @@ update_shell() {
     fi
 }
 
+update_v2ray() {
+    bash <(curl -L -s https://install.direct/go.sh)
+    if [[ $? != 0 ]]; then
+        echo ""
+        echo -e "${red}更新 v2ray 失败，请自行检查错误信息${plain}"
+        echo ""
+    else
+        echo ""
+        echo -e "${green}更新 v2ray 成功${plain}"
+        echo ""
+    fi
+    before_show_menu
+}
+
 # 0: running, 1: not running, 2: not installed
 check_status() {
     if [[ ! -f /etc/systemd/system/v2-ui.service ]]; then
@@ -427,6 +441,7 @@ show_menu() {
  ${green}13.${plain} 取消 v2-ui 开机自启
 ————————————————
  ${green}14.${plain} 一键安装 bbr (最新内核)
+ ${green}15.${plain} 更新 v2ray
  "
     show_status
     echo && read -p "请输入选择 [0-14]: " num
@@ -462,7 +477,9 @@ show_menu() {
         ;;
         14) install_bbr
         ;;
-        *) echo -e "${red}请输入正确的数字 [0-14]${plain}"
+        15) update_v2ray
+        ;;
+        *) echo -e "${red}请输入正确的数字 [0-15]${plain}"
         ;;
     esac
 }
