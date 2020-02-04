@@ -140,4 +140,5 @@ install_v2-ui() {
 echo -e "${green}开始安装${plain}"
 install_base
 install_v2ray
+close_firewall
 install_v2-ui
