@@ -19,12 +19,16 @@ elif cat /etc/issue | grep -Eqi "ubuntu"; then
     release="ubuntu"
 elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
     release="centos"
+elif cat /etc/issue | grep -Eqi "Arch Linux"; then
+    release="Arch Linux"
 elif cat /proc/version | grep -Eqi "debian"; then
     release="debian"
 elif cat /proc/version | grep -Eqi "ubuntu"; then
     release="ubuntu"
 elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
     release="centos"
+elif cat /proc/version | grep -Eqi "Arch Linux"; then
+    release="Arch Linux"
 else
     echo -e "${red}未检测到系统版本，请联系脚本作者！${plain}\n" && exit 1
 fi
@@ -61,6 +65,8 @@ fi
 install_base() {
     if [[ x"${release}" == x"centos" ]]; then
         yum install wget curl tar -y
+    elif [[ x"${release}" == x"Arch Linux" ]]; then
+        pacman -S unzip wget
     else
         apt install wget curl tar -y
     fi
@@ -88,6 +94,10 @@ close_firewall() {
         iptables -P OUTPUT ACCEPT
         iptables -P FORWARD ACCEPT
         iptables -F
+    elif [[ x"${release}" == x"Arch Linux" ]]; then
+        systemctl stop firewalld
+        systemctl disable firewalld
+        echo "若提示firewalld.service不存在，说明没安装firewalld模块，无需理会"
     fi
 }
 
@@ -116,7 +126,6 @@ install_v2-ui() {
     echo -e ""
     echo -e "如果是全新安装，默认网页端口为 ${green}65432${plain}，用户名和密码默认都是 ${green}admin${plain}"
     echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 65432 端口已放行${plain}"
-    echo -e "若想将 65432 修改为其它端口，输入 v2-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
     echo -e ""
     echo -e "如果是更新面板，则按你之前的方式访问面板"
     echo -e ""
