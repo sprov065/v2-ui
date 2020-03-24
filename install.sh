@@ -68,7 +68,7 @@ install_base() {
 
 install_v2ray() {
     echo -e "${green}开始安装or升级v2ray${plain}"
-    bash <(curl -L -s https://install.direct/go.sh)
+    bash <(curl -L -s https://install.direct/go.sh) -f
     if [[ $? -ne 0 ]]; then
         echo -e "${red}v2ray安装或升级失败，请检查错误信息${plain}"
         echo -e "${yellow}大多数原因可能是因为你当前服务器所在的地区无法下载 v2ray 安装包导致的，这在国内的机器上较常见，解决方式是手动安装 v2ray，具体原因还是请看上面的错误信息${plain}"
