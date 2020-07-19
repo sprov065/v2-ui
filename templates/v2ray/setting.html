@@ -138,6 +138,10 @@
                 name: '{{ _('Statistical traffic interval time') }} ({{ _('seconds') }})',
                 tip: '{{ _('Too small number can lead to increased CPU usage, fill 0 or negative at your own risk.') }}',
             },
+            reset_traffic_day: {
+                name: '{{ _('Reset traffic day') }}',
+                tip: '{{ _('0 means no reset, greater than 0 will reset all users traffic every month on the set date, time depends on server time zone.') }}',
+            },
             v2ctl_cmd_path: {
                 name: '{{ _('v2ctl command location') }}',
                 tip: '{{ _('Usually do not have to modify.') }}',

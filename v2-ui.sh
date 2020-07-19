@@ -13,8 +13,6 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
-version="v1.0.1"
-
 # check root
 [[ $EUID -ne 0 ]] && echo -e "${red}错误: ${plain} 必须使用root用户运行此脚本！\n" && exit 1
 
@@ -280,7 +278,7 @@ disable() {
 
 show_log() {
     echo && echo -n -e "面板使用过程中可能会输出许多 WARNING 日志，如果面板使用没有什么问题的话，那就没有问题，按回车继续: " && read temp
-    tail -f /etc/v2-ui/v2-ui.log
+    tail -500f /etc/v2-ui/v2-ui.log
     if [[ $# == 0 ]]; then
         before_show_menu
     fi
@@ -419,7 +417,7 @@ show_usage() {
 
 show_menu() {
     echo -e "
-  ${green}v2-ui 面板管理脚本${plain} ${red}${version}${plain}
+  ${green}v2-ui 面板管理脚本${plain}
 --- https://blog.sprov.xyz/v2-ui ---
   ${green}0.${plain} 退出脚本
 ————————————————

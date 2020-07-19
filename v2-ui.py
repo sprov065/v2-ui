@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 
+import tornado
 import tornado.log
 import tornado.options
 from tornado import web, wsgi
@@ -65,13 +66,17 @@ if __name__ == '__main__':
             db.session.commit()
             print('The username and password have been reset to admin, please restart the panel now')
         elif sys.argv[1] == 'setport':
-            config.update_setting_by_key('port', sys.argv[2])
-            print('Set port to ' + sys.argv[2] + ' successfully')
+            if len(sys.argv) > 2:
+                port = sys.argv[2]
+            else:
+                port = 65432
+            config.update_setting_by_key('port', port)
+            print('Set port to ' + port + ' successfully')
         else:
             print('Invalid command')
             print('resetconfig: Reset all panel settings to default values')
             print('resetuser: Reset username and password to \'admin\'')
-            print('setport: Set port')
+            print('setport [number]: Set web port to [number], default is 65432')
     else:
         logging_init()
         try:

@@ -1,18 +1,25 @@
 import subprocess
+from threading import Timer
 
 
 def exec_cmd(cmd, timeout=10):
     code = -100
     p = None
     try:
-        with subprocess.Popen(['sh', '-c', cmd], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as p:
-            code = p.wait(timeout)
-            if code != 0:
-                return p.stdout.read().decode('utf-8'), code
-            result = p.stdout.read()
+        def close_task():
+            if p:
+                p.kill()
+        task = Timer(timeout, close_task)
+        task.start()
+        with subprocess.Popen(['sh', '-c', cmd], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as process:
+            p = process
+            code = process.wait(timeout)
+            result = process.stdout.read()
+            p = None
+            task.cancel()
         return result.decode('utf-8'), code
-    except Exception:
+    except BaseException:
         return '', code
     finally:
         if p:
-            p.send_signal(9)
+            p.kill()

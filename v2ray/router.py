@@ -5,6 +5,7 @@ from flask_babel import gettext
 from sqlalchemy import and_
 
 from base.models import Msg
+from base.models import User
 from init import db
 from util import config, server_info
 from util.v2_jobs import v2_config_change
@@ -27,7 +28,10 @@ def accounts():
     from init import common_context
     inbs = Inbound.query.all()
     inbs = '[' + ','.join([json.dumps(inb.to_json(), ensure_ascii=False) for inb in inbs]) + ']'
-    return render_template('v2ray/accounts.html', **common_context, inbounds=inbs)
+    user = User.query.first()
+    has_changed = user.username != 'admin' or user.password != 'admin'
+    return render_template('v2ray/accounts.html', **common_context,
+                           inbounds=inbs, has_changed=has_changed)
 
 
 @v2ray_bp.route('/clients/', methods=['GET'])

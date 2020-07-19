@@ -599,6 +599,13 @@ class Inbound extends V2CommonClass {
             host = this.stream.quic.security;
             path = this.stream.quic.key;
         }
+
+        if (this.stream.security === 'tls') {
+            if (!isEmpty(this.stream.tls.server)) {
+                address = this.stream.tls.server;
+            }
+        }
+
         let obj = {
             v: '2',
             ps: this.remark,

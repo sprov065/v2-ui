@@ -20,6 +20,9 @@
             <a-layout-content>
                 <a-spin :spinning="spinning" :delay="500" tip="{{ _('loading') }}">
                     <transition name="list" appear>
+                        <a-tag v-if="!{{ 'true' if has_changed else 'false' }}" color="red" style="margin-bottom: 10px">
+                            {{ _('Please go to the panel settings as soon as possible to modify the username and password, otherwise there may be a risk of leaking account information') }}
+                        </a-tag>
                         <a-card hoverable style="margin-bottom: 20px;">
                             <div slot="title">
                                 <a-button type="primary" icon="plus" @click="openAddInbound"></a-button>
