@@ -23,6 +23,8 @@
                         <a-tag v-if="!{{ 'true' if has_changed else 'false' }}" color="red" style="margin-bottom: 10px">
                             {{ _('Please go to the panel settings as soon as possible to modify the username and password, otherwise there may be a risk of leaking account information') }}
                         </a-tag>
+                    </transition>
+                    <transition name="list" appear>
                         <a-card hoverable style="margin-bottom: 20px;">
                             <div slot="title">
                                 <a-button type="primary" icon="plus" @click="openAddInbound"></a-button>
@@ -57,7 +59,7 @@
                         <a-card v-for="inbound in searchedInbounds" :key="inbound.id" hoverable>
                             <div slot="title">
                                 <a-tag class="hidden-sm-and-down" color="green">[[ inbound.protocol ]]</a-tag>
-                                <a-button v-if="[Protocols.VMESS, Protocols.SHADOWSOCKS].indexOf(inbound.protocol) >= 0"
+                                <a-button v-if="[Protocols.VMESS, Protocols.SHADOWSOCKS, Protocols.TROJAN].indexOf(inbound.protocol) >= 0"
                                           type="primary" icon="qrcode"
                                           @click="qrModal.show(
                                                     '{{ _('qrcode') }}',
@@ -105,23 +107,31 @@
                                         {{ _('port') }}：
                                         <a-tag color="green">[[ inbound.port ]]</a-tag>
                                     </a-col>
-                                    <!-- vmess -->
-                                    <template v-if="inbound.protocol === Protocols.VMESS">
-                                        <a-col :xs="24" :sm="24" :lg="12">
-                                            id：
-                                            <a-tag color="green">[[ inbound.settings.vmesses[0].id ]]</a-tag>
-                                        </a-col>
-                                        <a-col :xs="24" :sm="24" :lg="12">
-                                            {{ _('alter id') }}：
-                                            <a-tag color="green">[[ inbound.settings.vmesses[0].alterId ]]</a-tag>
-                                        </a-col>
-                                        <a-col :xs="24" :sm="24" :lg="12">
-                                            {{ _('method') }}：
-                                            <a-tag v-if="inbound.settings.disableInsecure" color="green">
-                                                [[ VmessMethods.AES_128_GCM ]]、[[ VmessMethods.CHACHA20_POLY1305 ]]
-                                            </a-tag>
-                                            <a-tag v-else color="green">auto</a-tag>
-                                        </a-col>
+                                    <!-- vmess or vless -->
+                                    <template v-if="inbound.protocol === Protocols.VMESS || inbound.protocol === Protocols.VLESS">
+                                        <template v-if="inbound.protocol === Protocols.VMESS">
+                                            <a-col :xs="24" :sm="24" :lg="12">
+                                                id：
+                                                <a-tag color="green">[[ inbound.settings.vmesses[0].id ]]</a-tag>
+                                            </a-col>
+                                            <a-col :xs="24" :sm="24" :lg="12">
+                                                {{ _('alter id') }}：
+                                                <a-tag color="green">[[ inbound.settings.vmesses[0].alterId ]]</a-tag>
+                                            </a-col>
+                                            <a-col :xs="24" :sm="24" :lg="12">
+                                                {{ _('method') }}：
+                                                <a-tag v-if="inbound.settings.disableInsecure" color="green">
+                                                    [[ VmessMethods.AES_128_GCM ]]、[[ VmessMethods.CHACHA20_POLY1305 ]]
+                                                </a-tag>
+                                                <a-tag v-else color="green">auto</a-tag>
+                                            </a-col>
+                                        </template>
+                                        <template v-if="inbound.protocol === Protocols.VLESS">
+                                            <a-col :xs="24" :sm="24" :lg="12">
+                                                id：
+                                                <a-tag color="green">[[ inbound.settings.vlesses[0].id ]]</a-tag>
+                                            </a-col>
+                                        </template>
                                         <a-col :xs="24" :sm="24" :lg="12">
                                             {{ _('transport') }}：
                                             <a-tag color="green">[[ inbound.stream.network ]]</a-tag>
@@ -191,12 +201,19 @@
                                                 {{ _('domain') }}：
                                                 <a-tag color="green">[[ empDefault(inbound.stream.tls.server, '{{ _('none') }}') ]]</a-tag>
                                             </a-col>
-                                            <a-col :xs="24" :sm="24" :lg="12">
-                                                {{ _('allow insecure') }}：
-                                                <a-tag v-if="inbound.stream.tls.allowInsecure" color="green">{{ _('yes') }}</a-tag>
-                                                <a-tag v-else color="green">{{ _('no') }}</a-tag>
-                                            </a-col>
+{#                                            <a-col :xs="24" :sm="24" :lg="12">#}
+{#                                                {{ _('allow insecure') }}：#}
+{#                                                <a-tag v-if="inbound.stream.tls.allowInsecure" color="green">{{ _('yes') }}</a-tag>#}
+{#                                                <a-tag v-else color="green">{{ _('no') }}</a-tag>#}
+{#                                            </a-col>#}
                                         </template>
+                                    </template>
+                                    <!-- trojan -->
+                                    <template v-if="inbound.protocol === Protocols.TROJAN">
+                                        <a-col :xs="24" :sm="24" :lg="12">
+                                            {{ _('password') }}：
+                                            <a-tag color="green">[[ inbound.settings.clients[0].password ]]</a-tag>
+                                        </a-col>
                                     </template>
                                     <!-- shadowsocks -->
                                     <template v-if="inbound.protocol === Protocols.SHADOWSOCKS">

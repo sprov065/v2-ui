@@ -5,6 +5,7 @@ block_cipher = None
 BASE_DIR = os.path.abspath('')
 
 datas = [
+  (os.path.join(BASE_DIR, 'bin'), './bin'),
   (os.path.join(BASE_DIR, 'templates'), './templates'),
   (os.path.join(BASE_DIR, 'translations'), './translations'),
   (os.path.join(BASE_DIR, 'static'), './static'),

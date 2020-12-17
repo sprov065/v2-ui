@@ -7,7 +7,7 @@ from sqlalchemy import and_
 from base.models import Msg
 from base.models import User
 from init import db
-from util import config, server_info
+from util import config, server_info, v2_util
 from util.v2_jobs import v2_config_change
 from v2ray.models import Inbound
 
@@ -45,7 +45,8 @@ def setting():
     from init import common_context
     settings = config.all_settings()
     settings = '[' + ','.join([json.dumps(s.to_json(), ensure_ascii=False) for s in settings]) + ']'
-    return render_template('v2ray/setting.html', **common_context, settings=settings)
+    return render_template('v2ray/setting.html', **common_context, settings=settings,
+                           v2ray_version=v2_util.get_v2ray_version())
 
 
 @v2ray_bp.route('/tutorial/', methods=['GET'])

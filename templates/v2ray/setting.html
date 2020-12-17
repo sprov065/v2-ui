@@ -118,10 +118,10 @@
                 name: '{{ _('Login page title') }}',
                 tip: '',
             },
-            v2_config_path: {
+            {#v2_config_path: {
                 name: '{{ _('v2ray config.json path') }}',
                 tip: '{{ _('Be careful modifying it! ! ! The resulting v2ray configuration is written to the file of this configuration and generally does not need to be modified.') }}',
-            },
+            },#}
             v2_template_config: {
                 name: '{{ _('v2ray config template') }}',
                 tip: '{{ _('Be careful modifying it! ! ! Make sure you are very familiar with the configuration of v2ray, please do not delete the configuration about api.') }}',
@@ -138,14 +138,14 @@
                 name: '{{ _('Statistical traffic interval time') }} ({{ _('seconds') }})',
                 tip: '{{ _('Too small number can lead to increased CPU usage, fill 0 or negative at your own risk.') }}',
             },
-            reset_traffic_day: {
+            {#reset_traffic_day: {
                 name: '{{ _('Reset traffic day') }}',
                 tip: '{{ _('0 means no reset, greater than 0 will reset all users traffic every month on the set date, time depends on server time zone.') }}',
-            },
-            v2ctl_cmd_path: {
+            },#}
+            {#v2ctl_cmd_path: {
                 name: '{{ _('v2ctl command location') }}',
                 tip: '{{ _('Usually do not have to modify.') }}',
-            },
+            },#}
         };
 
         let app = new Vue({
@@ -179,8 +179,12 @@
                         if (settings_translate[key]) {
                             setting.name = settings_translate[key].name;
                             setting.tip = settings_translate[key].tip;
+                        } else {
+                            settings.splice(i, 1);
+                            --i;
                         }
                     }
+                    settings.unshift({name: '{{ _('V2ray core version') }}', value: '{{ v2ray_version }}'});
                     settings.unshift({name: '{{ _('current panel version') }}', value: '{{ cur_ver }}'});
                     this.settings = settings;
                 },

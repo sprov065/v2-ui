@@ -12,7 +12,7 @@
         </a-form-item>
         <a-form-item label="{{ _('protocol') }}">
             <a-select v-model="inModal.inbound.protocol" style="width: 160px;"
-                      @change="value => inModal.inbound.settings = Inbound.Settings.getSettings(value)">
+                      @change="protocolChange">
                 <a-select-option v-for="p in Protocols" :key="p" :value="p">[[ p ]]</a-select-option>
             </a-select>
         </a-form-item>
@@ -47,6 +47,22 @@
         </a-form-item>
     </a-form>
 
+    <!-- vmess settings -->
+    <a-form v-if="inModal.inbound.protocol === Protocols.VLESS"
+            layout="inline">
+        <a-form-item label="id">
+            <a-input v-model.trim="inModal.inbound.settings.vlesses[0].id"></a-input>
+        </a-form-item>
+    </a-form>
+
+    <!-- trojan settings -->
+    <a-form v-if="inModal.inbound.protocol === Protocols.TROJAN"
+            layout="inline">
+        <a-form-item label="{{ _('password') }}">
+            <a-input v-model.trim="inModal.inbound.settings.clients[0].password"></a-input>
+        </a-form-item>
+    </a-form>
+
     <!-- shadowsocks -->
     <a-form v-if="inModal.inbound.protocol === Protocols.SHADOWSOCKS"
             layout="inline">
@@ -68,7 +84,9 @@
     </a-form>
 
     <!-- stream settings -->
-    <template v-if="inModal.inbound.protocol === Protocols.VMESS">
+    <template v-if="inModal.inbound.protocol === Protocols.VMESS
+                    || inModal.inbound.protocol === Protocols.VLESS
+                    || inModal.inbound.protocol === Protocols.SHADOWSOCKS">
 
         <!-- select stream network -->
         <a-form layout="inline">
@@ -180,6 +198,9 @@
                     <a-select-option value="dtls">dtls（{{ _('camouflage DTLS 1.2 packages') }}）</a-select-option>
                     <a-select-option value="wireguard">wireguard（{{ _('camouflage wireguard packages') }}）</a-select-option>
                 </a-select>
+            </a-form-item>
+            <a-form-item label="{{ _('password') }}">
+                <a-input v-model.number="inModal.inbound.stream.kcp.seed"></a-input>
             </a-form-item>
             <a-form-item label="{{ _('mtu') }}">
                 <a-input type="number" v-model.number="inModal.inbound.stream.kcp.mtu"></a-input>
@@ -326,11 +347,14 @@
     </a-form>
 
     <!-- tls settings -->
-    <template v-if="inModal.inbound.protocol === Protocols.VMESS
+    <template v-if="(inModal.inbound.protocol === Protocols.VMESS
+                    || inModal.inbound.protocol === Protocols.VLESS
+                    || inModal.inbound.protocol === Protocols.TROJAN
+                    || inModal.inbound.protocol === Protocols.SHADOWSOCKS)
                     && ['tcp', 'ws', 'http', 'quic'].indexOf(inModal.inbound.stream.network) >= 0">
 
         <!-- tls enable -->
-        <a-form layout="inline">
+        <a-form layout="inline" v-if="inModal.inbound.protocol !== Protocols.TROJAN">
             <a-form-item label="tls">
                 <a-switch
                         :checked="inModal.inbound.stream.security === 'tls'"
@@ -345,9 +369,9 @@
             <a-form-item label="{{ _('domain') }}">
                 <a-input v-model.trim="inModal.inbound.stream.tls.server"></a-input>
             </a-form-item>
-            <a-form-item label="{{ _('allow insecure') }}">
-                <a-switch v-model="inModal.inbound.stream.tls.allowInsecure"></a-switch>
-            </a-form-item>
+{#            <a-form-item label="{{ _('allow insecure') }}">#}
+{#                <a-switch v-model="inModal.inbound.stream.tls.allowInsecure"></a-switch>#}
+{#            </a-form-item>#}
             <a-form-item label="{{ _('certificate') }}">
                 <a-radio-group v-model="inModal.inbound.stream.tls.certs[0].useFile"
                                button-style="solid">
@@ -427,8 +451,10 @@
         }
     };
 
-    let protocols = {
+    const protocols = {
         VMESS: Protocols.VMESS,
+        VLESS: Protocols.VLESS,
+        TROJAN: Protocols.TROJAN,
         SHADOWSOCKS: Protocols.SHADOWSOCKS,
         DOKODEMO: Protocols.DOKODEMO,
         SOCKS: Protocols.SOCKS,
@@ -447,6 +473,12 @@
             streamNetworkChange(oldValue) {
                 if (oldValue === 'kcp') {
                     this.inModal.inbound.stream.security = 'none';
+                }
+            },
+            protocolChange(value) {
+                this.inModal.inbound.settings = Inbound.Settings.getSettings(value);
+                if (value === Protocols.TROJAN) {
+                    this.inModal.inbound.stream.security = 'tls';
                 }
             }
         }

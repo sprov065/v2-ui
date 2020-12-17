@@ -14,6 +14,7 @@
         {% include 'v2ray/common_sider.html' %}
         <a-layout id="content-layout">
             <a-layout-content>
+                <a-spin :spinning="spinning" :delay="200" :tip="loadingTip"/>
                 <transition name="list" appear>
                 <a-row>
                     <a-card hoverable>
@@ -64,12 +65,14 @@
                             v2ray {{ _('status') }}: <a-tag :color="status.v2.color">[[ status.v2.stat ]]</a-tag>
                             <a-tooltip v-if="status.v2.stat === '{{ _('error') }}'">
                                 <template slot="title">
-                                    <p>{{ _('May be due to account information configuration error caused by v2ray startup failure.') }}</p>
-                                    <p>{{ _('Check the account information and the v2ray configuration template for errors, or determine the cause based on the v2ray error message.') }}</p>
-                                    <p>{{ _('If v2ray is running and all accounts are available, ignore this error..') }}</p>
+                                    <p v-for="line in status.v2.error_msg.split('\n')">[[ line ]]</p>
+{#                                    <p>{{ _('May be due to account information configuration error caused by v2ray startup failure.') }}</p>#}
+{#                                    <p>{{ _('Check the account information and the v2ray configuration template for errors, or determine the cause based on the v2ray error message.') }}</p>#}
+{#                                    <p>{{ _('If v2ray is running and all accounts are available, ignore this error..') }}</p>#}
                                 </template>
                                 <a-icon type="question-circle" theme="filled"></a-icon>
                             </a-tooltip>
+                            <a-tag color="blue" @click="openSelectV2rayVersion">{{ _('Switch version') }}</a-tag>
                         </a-card>
                     </a-col>
                     <a-col :sm="24" :md="12">
@@ -151,6 +154,18 @@
                 </transition>
             </a-layout-content>
         </a-layout>
+        <a-modal id="version-modal" v-model="versionModal.visible" title="{{ _('Switch v2ray version') }}"
+                 :closable="true" @ok="() => versionModal.visible = false"
+                 ok-text="{{ _('confirm') }}" cancel-text="{{ _('close') }}">
+            <h2>{{ _('Click on the v2ray-core version you want to switch.') }}</h2>
+            <h2>{{ _('Please choose carefully, the old version may be incompatible with the configuration.') }}</h2>
+            <template v-for="version, index in versionModal.versions">
+                <a-tag :color="index % 2 == 0 ? 'blue' : 'green'"
+                       style="margin: 10px" @click="switchV2rayVersion(version)">
+                    [[ version ]]
+                </a-tag>
+            </template>
+        </a-modal>
     </a-layout>
 
 {% endblock %}
@@ -175,13 +190,32 @@
             udp_count: '..',
         };
 
+        const versionModal = {
+            visible: false,
+            versions: [],
+            show(versions) {
+                this.visible = true;
+                this.versions = versions;
+            },
+            hide() {
+                this.visible = false;
+            },
+        };
+
         let app = new Vue({
             delimiters: ['[[', ']]'],
             el: '#app',
             data: {
-                status: status,
+                status,
+                versionModal,
+                spinning: false,
+                loadingTip: '{{ _('loading') }}',
             },
             methods: {
+                loading(spinning, tip = '{{ _('loading') }}') {
+                    this.spinning = spinning;
+                    this.loadingTip = tip;
+                },
                 getStatus() {
                     get({
                         url: '/server/status',
@@ -220,6 +254,43 @@
                     } else {
                         return '#F56C6C';
                     }
+                },
+                openSelectV2rayVersion() {
+                    this.loading(true);
+                    get({
+                        url: '/server/get_v2ray_versions',
+                        success: data => {
+                            this.loading(false);
+                            if (!data.success) {
+                                return;
+                            }
+                            versionModal.show(data.obj);
+                        },
+                        error: () => {
+                            this.loading(false);
+                        },
+                    });
+                },
+                switchV2rayVersion(version) {
+                    this.$confirm({
+                        title: '{{ _('Switch v2ray version') }}',
+                        content: '{{ _('Are you sure you want to switch to v2ray') }}' + ` ${version}?`,
+                        okText: '{{ _('confirm') }}',
+                        cancelText: '{{ _('cancel') }}',
+                        onOk: () => {
+                            versionModal.hide();
+                            this.loading(true, '{{ _('installing, please do not leave this page.') }}');
+                            post({
+                                url: `/server/install_v2ray/${version}`,
+                                success: () => {
+                                    this.loading(false);
+                                },
+                                error: () => {
+                                    this.loading(false);
+                                },
+                            });
+                        },
+                    });
                 },
             },
             mounted() {

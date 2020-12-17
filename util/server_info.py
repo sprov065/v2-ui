@@ -3,7 +3,7 @@ import time
 
 import psutil
 
-from util import cmd_util
+from util import cmd_util, v2_util
 from util.schedule_util import schedule_job
 
 __status = {}
@@ -42,23 +42,28 @@ def refresh_status():
 
 
 def v2_status():
-    result, code = cmd_util.exec_cmd('systemctl is-active v2ray')
-    results = result.split('\n')
-    has_result = False
-    for result in results:
-        if result.startswith('active'):
-            code = 0
-            has_result = True
-            break
-        elif result.startswith('inactive'):
-            code = 1
-            has_result = True
-            break
-
-    if not has_result:
-        code = 2
+    # result, code = cmd_util.exec_cmd('systemctl is-active v2ray')
+    # results = result.split('\n')
+    # has_result = False
+    # for result in results:
+    #     if result.startswith('active'):
+    #         code = 0
+    #         has_result = True
+    #         break
+    #     elif result.startswith('inactive'):
+    #         code = 1
+    #         has_result = True
+    #         break
+    #
+    # if not has_result:
+    #     code = 2
+    code = v2_util.__get_stat_code()
+    version = v2_util.get_v2ray_version()
+    msg = v2_util.get_v2ray_error_msg()
     __status['v2'] = {
-        'code': code
+        'code': code,
+        'version': version,
+        'error_msg': msg,
     }
 
 

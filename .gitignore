@@ -1,0 +1,12 @@
+/.idea
+/venv
+__pycache__
+/v2-ui.tar.gz
+/v2-ui-linux.tar.gz
+/buid
+/dist
+/.github
+/bin/v2ctl.exe
+/bin/v2ray.exe
+/bin/v2ray-win.exe
+/bin/config.json

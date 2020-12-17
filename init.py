@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 from flask import Flask, request, redirect, url_for, jsonify
 from flask_babel import Babel, gettext
@@ -74,8 +75,9 @@ def init_bps():
 
 
 def init_v2_jobs():
-    from util import v2_jobs
+    from util import v2_jobs, v2_util
     v2_jobs.init()
+    v2_util.init_v2ray()
 
 
 def is_ajax():
@@ -103,9 +105,17 @@ def error_handle(e):
     return response
 
 
+def logging_init():
+    logging.basicConfig(stream=sys.stdout,
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        format='%(asctime)s-%(name)s-%(levelname)s-%(message)s',
+                        level=logging.INFO)
+
+
 init_db()
 init_app()
 init_common_context()
 init_bps()
 init_v2_jobs()
 start_schedule()
+logging_init()

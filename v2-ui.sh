@@ -76,7 +76,7 @@ confirm() {
 }
 
 confirm_restart() {
-    confirm "是否重启面板" "y"
+    confirm "是否重启面板，重启面板也会重启 v2ray" "y"
     if [[ $? == 0 ]]; then
         restart
     else
@@ -122,7 +122,7 @@ update() {
 }
 
 uninstall() {
-    confirm "确定要卸载面板吗?" "n"
+    confirm "确定要卸载面板吗，v2ray 也会卸载?" "n"
     if [[ $? != 0 ]]; then
         if [[ $# == 0 ]]; then
             show_menu
@@ -218,7 +218,7 @@ stop() {
         sleep 2
         check_status
         if [[ $? == 1 ]]; then
-            echo -e "${green}v2-ui 停止成功${plain}"
+            echo -e "${green}v2-ui 与 v2ray 停止成功${plain}"
         else
             echo -e "${red}面板停止失败，可能是因为停止时间超过了两秒，请稍后查看日志信息${plain}"
         fi
@@ -234,7 +234,7 @@ restart() {
     sleep 2
     check_status
     if [[ $? == 0 ]]; then
-        echo -e "${green}v2-ui 重启成功${plain}"
+        echo -e "${green}v2-ui 与 v2ray 重启成功${plain}"
     else
         echo -e "${red}面板重启失败，可能是因为启动时间超过了两秒，请稍后查看日志信息${plain}"
     fi
@@ -309,20 +309,6 @@ update_shell() {
     fi
 }
 
-update_v2ray() {
-    bash <(curl -L -s https://install.direct/go.sh)
-    if [[ $? != 0 ]]; then
-        echo ""
-        echo -e "${red}更新 v2ray 失败，请自行检查错误信息${plain}"
-        echo ""
-    else
-        echo ""
-        echo -e "${green}更新 v2ray 成功${plain}"
-        echo ""
-    fi
-    before_show_menu
-}
-
 # 0: running, 1: not running, 2: not installed
 check_status() {
     if [[ ! -f /etc/systemd/system/v2-ui.service ]]; then
@@ -387,6 +373,7 @@ show_status() {
         2)
             echo -e "面板状态: ${red}未安装${plain}"
     esac
+    show_v2ray_status
 }
 
 show_enable_status() {
@@ -395,6 +382,24 @@ show_enable_status() {
         echo -e "是否开机自启: ${green}是${plain}"
     else
         echo -e "是否开机自启: ${red}否${plain}"
+    fi
+}
+
+check_v2ray_status() {
+    count=$(ps -ef | grep "v2ray-v2-ui" | grep -v "grep" | wc -l)
+    if [[ count -ne 0 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+show_v2ray_status() {
+    check_v2ray_status
+    if [[ $? == 0 ]]; then
+        echo -e "v2ray 状态: ${green}运行${plain}"
+    else
+        echo -e "v2ray 状态: ${red}未运行${plain}"
     fi
 }
 
@@ -439,7 +444,6 @@ show_menu() {
  ${green}13.${plain} 取消 v2-ui 开机自启
 ————————————————
  ${green}14.${plain} 一键安装 bbr (最新内核)
- ${green}15.${plain} 更新 v2ray
  "
     show_status
     echo && read -p "请输入选择 [0-14]: " num
@@ -475,9 +479,7 @@ show_menu() {
         ;;
         14) install_bbr
         ;;
-        15) update_v2ray
-        ;;
-        *) echo -e "${red}请输入正确的数字 [0-15]${plain}"
+        *) echo -e "${red}请输入正确的数字 [0-14]${plain}"
         ;;
     esac
 }

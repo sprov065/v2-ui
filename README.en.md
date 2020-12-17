@@ -1,9 +1,5 @@
 [中文](README.md) | English
 
-# Donate
-If you think the panel is easy to use, you can consider donation support, the amount is arbitrary, thank you for your support.
- - [Paypal](https://blog.sprov.xyz/go/support-paypal)
-
 # v2-ui
 Support multi-protocol multi-user v2ray panel
 
