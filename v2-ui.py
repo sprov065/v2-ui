@@ -71,6 +71,13 @@ if __name__ == '__main__':
             User.query.update({'username': 'admin', 'password': 'admin'})
             db.session.commit()
             print('The username and password have been reset to admin, please restart the panel now')
+        elif sys.argv[1] = "setbasepath":
+            if len(sys.argv) > 2:
+                base_path = sys.argv[2]
+            else
+                base_path = ""
+            config.update_setting_by_key("base_path", base_path)
+            print(f"Set base path to {base_path} successfully")
         elif sys.argv[1] == 'setport':
             if len(sys.argv) > 2:
                 port = sys.argv[2]
@@ -83,6 +90,7 @@ if __name__ == '__main__':
             print('resetconfig: Reset all panel settings to default values')
             print('resetuser: Reset username and password to \'admin\'')
             print('setport [number]: Set web port to [number], default is 65432')
+            print('setbasepath [basepath]: Set base path to [basepath] for reverse proxy')
         os._exit(0)
     else:
         init_windows()
